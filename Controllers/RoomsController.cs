@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ConferenceRoomBookingApi.Controllers;
 
+/// <summary>
+/// Manages conference rooms inventory, capacity, and base hourly pricing.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class RoomsController : ControllerBase
 {
     private readonly IRoomRepository _roomRepository;
@@ -16,6 +20,10 @@ public class RoomsController : ControllerBase
         _roomRepository = roomRepository;
     }
 
+    /// <summary>
+    /// Retrieves all available conference rooms.
+    /// </summary>
+    /// <response code="200">Returns the full collection of conference rooms.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<RoomDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
@@ -32,6 +40,12 @@ public class RoomsController : ControllerBase
         return Ok(dtos);
     }
 
+    /// <summary>
+    /// Retrieves a specific conference room by its unique identifier.
+    /// </summary>
+    /// <param name="id">The integer ID of the room.</param>
+    /// <response code="200">Returns the room details.</response>
+    /// <response code="404">If the room with the specified ID does not exist.</response>
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(RoomDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,7 +66,14 @@ public class RoomsController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Creates a new conference room.
+    /// </summary>
+    /// <param name="dto">The room creation payload containing name, capacity, and hourly rate.</param>
+    /// <response code="201">Returns the newly created room with generated ID.</response>
+    /// <response code="400">If the input model fails validation rules.</response>
     [HttpPost]
+    [Consumes("application/json")]
     [ProducesResponseType(typeof(RoomDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateRoomDto dto)

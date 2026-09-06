@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ConferenceRoomBookingApi.Controllers;
 
+/// <summary>
+/// Manages add-on services and equipment catalog available for reservations.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class ServicesController : ControllerBase
 {
     private readonly IServiceRepository _serviceRepository;
@@ -16,6 +20,10 @@ public class ServicesController : ControllerBase
         _serviceRepository = serviceRepository;
     }
 
+    /// <summary>
+    /// Retrieves all add-on services and equipment.
+    /// </summary>
+    /// <response code="200">Returns the full collection of add-on services.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<ServiceDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
@@ -31,6 +39,12 @@ public class ServicesController : ControllerBase
         return Ok(dtos);
     }
 
+    /// <summary>
+    /// Retrieves a specific service by its unique identifier.
+    /// </summary>
+    /// <param name="id">The integer ID of the service.</param>
+    /// <response code="200">Returns the service details.</response>
+    /// <response code="404">If the service with the specified ID does not exist.</response>
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(ServiceDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -50,7 +64,14 @@ public class ServicesController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Creates a new add-on service or equipment option.
+    /// </summary>
+    /// <param name="dto">The service creation payload containing name and flat price.</param>
+    /// <response code="201">Returns the newly created service with generated ID.</response>
+    /// <response code="400">If the input model fails validation rules.</response>
     [HttpPost]
+    [Consumes("application/json")]
     [ProducesResponseType(typeof(ServiceDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateServiceDto dto)
