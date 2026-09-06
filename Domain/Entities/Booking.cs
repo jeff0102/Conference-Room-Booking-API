@@ -1,3 +1,5 @@
+using ConferenceRoomBookingApi.Application.Services;
+
 namespace ConferenceRoomBookingApi.Domain.Entities;
 
 /// <summary>
@@ -36,12 +38,16 @@ public class Booking
     }
 
     /// <summary>
-    /// Calculates the total price based on the room's hourly base price and the sum of selected services.
+    /// Calculates the total price using the business rule price calculator, or fallback base rate.
     /// </summary>
-    /// <param name="roomBasePricePerHour">The hourly base price of the booked room.</param>
-    /// <returns>The calculated total price.</returns>
-    public decimal CalculateTotalPrice(decimal roomBasePricePerHour)
+    public decimal CalculateTotalPrice(decimal roomBasePricePerHour, IBookingPriceCalculator? calculator = null)
     {
+        if (calculator != null)
+        {
+            TotalPrice = calculator.CalculateTotalPrice(roomBasePricePerHour, BookingDate, DurationHours, SelectedServices);
+            return TotalPrice;
+        }
+
         var servicesTotal = SelectedServices.Sum(s => s.Price);
         var roomCost = roomBasePricePerHour * DurationHours;
         TotalPrice = roomCost + servicesTotal;

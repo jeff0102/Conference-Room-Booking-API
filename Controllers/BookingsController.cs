@@ -114,7 +114,7 @@ public class BookingsController : ControllerBase
         }
 
         var selectedServices = (await _serviceRepository.GetByIdsAsync(dto.ServiceIds)).ToList();
-        var totalPrice = _priceCalculator.CalculateTotalPrice(room.BasePricePerHour, dto.DurationHours, selectedServices);
+        var totalPrice = _priceCalculator.CalculateTotalPrice(room.BasePricePerHour, dto.BookingDate, dto.DurationHours, selectedServices);
 
         var booking = new Booking
         {
