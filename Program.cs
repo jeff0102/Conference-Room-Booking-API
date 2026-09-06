@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Database connection configuration for Dapper
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Server=localhost;Database=ConferenceRoomBookingDb;Trusted_Connection=True;TrustServerCertificate=True;";
+    ?? "Server=localhost,1433;Database=ConferenceRoomBookingDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;";
 
 builder.Services.AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(connectionString));
 
