@@ -29,7 +29,28 @@ public class DatabaseInitializer : IDatabaseInitializer
             var connectionString = _configuration.GetConnectionString("DefaultConnection")
                 ?? "Server=localhost,1433;Database=ConferenceRoomBookingDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;";
 
-            await EnsureDatabaseCreatedAsync(connectionString);
+            const int maxRetries = 5;
+            var retryDelay = TimeSpan.FromSeconds(3);
+
+            for (var attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    await EnsureDatabaseCreatedAsync(connectionString);
+                    break;
+                }
+                catch (SqlException ex) when (attempt < maxRetries)
+                {
+                    _logger.LogWarning(ex, "SQL Server is warming up, retrying in 3 seconds... (Attempt {Attempt}/{MaxRetries})", attempt, maxRetries);
+                    await Task.Delay(retryDelay);
+                }
+                catch (Exception ex) when (attempt < maxRetries && (ex is System.Data.Common.DbException || ex is InvalidOperationException || ex is TimeoutException || ex.GetBaseException() is System.Net.Sockets.SocketException))
+                {
+                    _logger.LogWarning(ex, "SQL Server is warming up, retrying in 3 seconds... (Attempt {Attempt}/{MaxRetries})", attempt, maxRetries);
+                    await Task.Delay(retryDelay);
+                }
+            }
+
             await EnsureSchemaAndSeedDataAsync();
         }
         catch (Exception ex)
