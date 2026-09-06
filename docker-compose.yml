@@ -13,5 +13,19 @@ services:
     volumes:
       - sqlserver-data:/var/opt/mssql
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: conference-room-booking-api
+    restart: unless-stopped
+    ports:
+      - "7192:8080"
+    depends_on:
+      - sqlserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=ConferenceRoomBookingDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+
 volumes:
   sqlserver-data:
