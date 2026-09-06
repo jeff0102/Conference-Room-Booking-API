@@ -1,9 +1,19 @@
+using ConferenceRoomBookingApi.Application.Services;
+using ConferenceRoomBookingApi.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Database connection configuration for Dapper
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=localhost;Database=ConferenceRoomBookingDb;Trusted_Connection=True;TrustServerCertificate=True;";
 
+builder.Services.AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(connectionString));
+
+// Business Logic Services
+builder.Services.AddScoped<IBookingPriceCalculator, BookingPriceCalculator>();
+
+// Controllers & Swagger
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
