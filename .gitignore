@@ -53,3 +53,11 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# .NET build directories
+[Bb]in/
+[Oo]bj/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
